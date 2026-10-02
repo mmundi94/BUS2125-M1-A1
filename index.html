@@ -1,0 +1,883 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Business Value in Action | Practice Activity</title>
+<style>
+  :root {
+    --ink: #13203f;
+    --ink-soft: #3d4766;
+    --muted: #6a7290;
+    --line: #e4e1ef;
+    --card: #ffffff;
+    --blue: #0b5394;
+    --blue-deep: #083d6e;
+    --yellow: #FFFF02;
+    --pink: #e0306f;
+    --pink-tint: #ffe3ee;
+    --orange: #ee6a0c;
+    --orange-tint: #ffe9d6;
+    --green: #0b9466;
+    --green-tint: #d9f6ea;
+    --blue-tint: #dcebfa;
+    --radius: 18px;
+    --radius-sm: 12px;
+    --shadow: 0 1px 2px rgba(19,32,63,.06), 0 8px 24px rgba(19,32,63,.08);
+    --shadow-lift: 0 2px 4px rgba(19,32,63,.08), 0 14px 32px rgba(19,32,63,.14);
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: "Segoe UI", system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif;
+    color: var(--ink);
+    font-size: 16px;
+    line-height: 1.55;
+    min-height: 100vh;
+    background-color: #fff3ea;
+    background-image:
+      radial-gradient(42rem 30rem at 0% 0%, rgba(255,128,178,.55), transparent 60%),
+      radial-gradient(40rem 32rem at 100% 0%, rgba(92,190,255,.55), transparent 60%),
+      radial-gradient(44rem 30rem at 100% 100%, rgba(255,196,64,.50), transparent 60%),
+      radial-gradient(40rem 30rem at 0% 100%, rgba(80,220,170,.45), transparent 60%);
+    position: relative;
+    overflow-x: hidden;
+  }
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    opacity: .22;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .6 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E");
+  }
+  .wrap { position: relative; z-index: 1; max-width: 1120px; margin: 0 auto; padding: 20px 16px 48px; }
+
+  /* Top bar */
+  .topbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-bottom: 16px; }
+  .brand { display: flex; flex-direction: column; line-height: 1.2; }
+  .brand-name { font-weight: 800; letter-spacing: .02em; font-size: 15px; color: var(--ink); }
+  .brand-course { font-size: 13px; color: var(--ink-soft); }
+  .chip-practice {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: var(--ink); color: #fff; font-weight: 700; font-size: 13px;
+    padding: 7px 14px; border-radius: 999px;
+  }
+  .chip-practice .dot { width: 9px; height: 9px; border-radius: 50%; background: var(--yellow); }
+
+  /* Progress */
+  .progress {
+    background: rgba(255,255,255,.82); backdrop-filter: blur(6px);
+    border-radius: var(--radius); box-shadow: var(--shadow);
+    padding: 14px 18px; margin-bottom: 18px;
+    display: flex; align-items: center; gap: 18px; flex-wrap: wrap;
+  }
+  .progress-label { font-weight: 800; font-size: 15px; min-width: 120px; }
+  .progress-label small { display: block; font-weight: 600; font-size: 12px; color: var(--muted); }
+  .steps { list-style: none; margin: 0; padding: 0; display: flex; gap: 6px; flex: 1; min-width: 240px; }
+  .steps li { flex: 1; }
+  .steps .bar { height: 8px; border-radius: 999px; background: #e8e5f1; overflow: hidden; }
+  .steps .bar span { display: block; height: 100%; width: 0; border-radius: 999px; background: linear-gradient(90deg, var(--blue), #2f8ad8); transition: width .35s ease; }
+  .steps li.done .bar span, .steps li.current .bar span { width: 100%; }
+  .steps li.current .bar span { background: linear-gradient(90deg, var(--pink), var(--orange)); }
+  .steps .name { display: block; font-size: 12px; font-weight: 600; color: var(--muted); margin-top: 5px; }
+  .steps li.current .name { color: var(--ink); }
+
+  /* Layout */
+  .layout { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 18px; align-items: start; }
+  .layout.full { grid-template-columns: minmax(0, 1fr); }
+  .layout.full .side { display: none; }
+  .card { background: var(--card); border-radius: var(--radius); box-shadow: var(--shadow); padding: 26px; }
+  .stage { display: flex; flex-direction: column; gap: 18px; min-width: 0; }
+  h1, h2, h3 { line-height: 1.2; margin: 0; }
+  h2:focus { outline: none; }
+  p { margin: 0; }
+
+  /* Hero */
+  .hero {
+    position: relative; overflow: hidden; color: #fff;
+    border-radius: var(--radius); padding: 34px 30px;
+    background:
+      radial-gradient(30rem 18rem at 90% 10%, rgba(255,140,40,.9), transparent 60%),
+      radial-gradient(26rem 18rem at 10% 100%, rgba(224,48,111,.95), transparent 60%),
+      linear-gradient(135deg, var(--blue) 0%, #1a63b0 55%, #3b3fb8 100%);
+    box-shadow: var(--shadow);
+  }
+  .hero::after {
+    content: ""; position: absolute; inset: 0; pointer-events: none; opacity: .35; mix-blend-mode: overlay;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='h'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.1' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23h)'/%3E%3C/svg%3E");
+  }
+  .hero > * { position: relative; z-index: 1; }
+  .hero .eyebrow { font-size: 13px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; opacity: .92; }
+  .hero h1 { font-size: clamp(28px, 4.4vw, 42px); font-weight: 800; margin: 10px 0 12px; }
+  .mark { background: linear-gradient(transparent 58%, var(--yellow) 58%, var(--yellow) 92%, transparent 92%); color: inherit; padding: 0 4px; }
+  .hero .mark { color: var(--ink); background: var(--yellow); border-radius: 8px; padding: 0 10px; }
+  .hero p.lead { font-size: 17px; max-width: 640px; opacity: .96; }
+
+  /* Brief tiles */
+  .brief-grid { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 12px; }
+  .tile { border-radius: var(--radius-sm); padding: 16px; display: flex; gap: 12px; align-items: flex-start; }
+  .tile h3 { font-size: 14px; font-weight: 800; margin-bottom: 3px; }
+  .tile p { font-size: 14.5px; color: var(--ink-soft); }
+  .tile .ic { flex-shrink: 0; width: 40px; height: 40px; border-radius: 12px; display: grid; place-items: center; color: #fff; }
+  .t-pink { background: var(--pink-tint); } .t-pink .ic { background: var(--pink); }
+  .t-orange { background: var(--orange-tint); } .t-orange .ic { background: var(--orange); }
+  .t-green { background: var(--green-tint); } .t-green .ic { background: var(--green); }
+  .t-blue { background: var(--blue-tint); } .t-blue .ic { background: var(--blue); }
+  .ic svg { width: 22px; height: 22px; }
+
+  .section-title { font-size: 13px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); margin-bottom: 12px; }
+
+  /* Value chain */
+  .chain { display: flex; align-items: stretch; gap: 0; flex-wrap: wrap; row-gap: 8px; }
+  .chain .node {
+    flex: 1 1 0; min-width: 96px; text-align: center; font-size: 13px; font-weight: 700;
+    padding: 10px 8px; border-radius: 10px; background: #f1eff8; color: var(--muted);
+    border: 2px solid transparent; transition: all .3s ease;
+  }
+  .chain .node.lit { background: var(--blue); color: #fff; }
+  .chain .node.miss { background: #fff; border: 2px dashed #cfcbe0; color: #9aa0b8; }
+  .chain .arrow { display: grid; place-items: center; width: 22px; color: #a3a8c0; font-weight: 800; }
+
+  .how { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 12px; }
+  .how .step { border: 1.5px solid var(--line); border-radius: var(--radius-sm); padding: 14px; }
+  .how .num { font-size: 12px; font-weight: 800; color: var(--blue); letter-spacing: .05em; text-transform: uppercase; }
+  .how h3 { font-size: 15px; margin: 3px 0 2px; }
+  .how p { font-size: 13.5px; color: var(--ink-soft); }
+
+  .note { font-size: 14px; color: var(--ink-soft); background: #f7f5fc; border-radius: var(--radius-sm); padding: 12px 14px; }
+
+  /* Buttons */
+  .btn {
+    appearance: none; border: 0; cursor: pointer; font: inherit; font-weight: 800; font-size: 15px;
+    padding: 13px 22px; border-radius: 999px; display: inline-flex; align-items: center; gap: 10px;
+    transition: transform .15s ease, box-shadow .15s ease, background .15s ease;
+  }
+  .btn-primary { background: var(--ink); color: #fff; box-shadow: 0 6px 16px rgba(19,32,63,.25); }
+  .btn-primary:hover:not(:disabled) { transform: translateY(-1px); background: #1d2d56; }
+  .btn-primary:disabled { background: #b9bccb; box-shadow: none; cursor: not-allowed; }
+  .btn-ghost { background: #fff; color: var(--ink); border: 2px solid var(--ink); }
+  .btn-ghost:hover { background: #f4f3fa; }
+  .btn svg { width: 18px; height: 18px; }
+  :focus-visible { outline: 3px solid var(--blue); outline-offset: 3px; }
+  .btn:focus-visible { outline: 3px solid var(--yellow); box-shadow: 0 0 0 6px var(--ink); }
+  .actions { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+  .actions .hint { font-size: 13.5px; color: var(--muted); }
+
+  /* Round header */
+  .round-chip { display: inline-flex; align-items: center; gap: 8px; font-size: 12.5px; font-weight: 800; letter-spacing: .05em; text-transform: uppercase; padding: 6px 12px; border-radius: 999px; color: #fff; }
+  .round-head h2 { font-size: clamp(22px, 3.2vw, 30px); font-weight: 800; margin: 10px 0 8px; }
+  .round-head p { color: var(--ink-soft); font-size: 16px; }
+  .bridge { border-left: 4px solid var(--orange); padding: 2px 0 2px 12px; margin-bottom: 10px; color: var(--ink); font-weight: 600; }
+
+  .facts { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 12px; }
+  .fact { border-radius: var(--radius-sm); padding: 14px; background: #f7f5fc; }
+  .fact .fic { width: 34px; height: 34px; border-radius: 10px; display: grid; place-items: center; background: #fff; margin-bottom: 8px; }
+  .fact .fic svg { width: 19px; height: 19px; }
+  .fact h3 { font-size: 14px; margin-bottom: 2px; }
+  .fact p { font-size: 13.5px; color: var(--ink-soft); }
+
+  /* Options */
+  .question { font-size: 18px; font-weight: 800; margin-bottom: 4px; }
+  .question-sub { font-size: 14px; color: var(--muted); margin-bottom: 14px; }
+  .options { display: flex; flex-direction: column; gap: 12px; }
+  .opt {
+    appearance: none; font: inherit; color: inherit; text-align: left; cursor: pointer; width: 100%;
+    display: flex; gap: 16px; align-items: flex-start; background: #fff;
+    border: 2px solid var(--line); border-radius: 16px; padding: 16px 18px; position: relative;
+    transition: border-color .15s ease, box-shadow .15s ease, transform .15s ease, background .15s ease;
+  }
+  .opt:hover:not(:disabled) { border-color: #9fb9d8; box-shadow: var(--shadow-lift); transform: translateY(-2px); }
+  .opt:focus-visible { outline: 3px solid var(--blue); outline-offset: 3px; }
+  .opt .oic { flex-shrink: 0; width: 50px; height: 50px; border-radius: 14px; display: grid; place-items: center; color: #fff; }
+  .opt .oic svg { width: 26px; height: 26px; }
+  .opt .letter { font-size: 12px; font-weight: 800; color: var(--muted); letter-spacing: .06em; }
+  .opt h3 { font-size: 16.5px; font-weight: 800; margin: 1px 0 3px; }
+  .opt p { font-size: 14.5px; color: var(--ink-soft); }
+  .opt .radio { margin-left: auto; flex-shrink: 0; width: 24px; height: 24px; border-radius: 50%; border: 2px solid #c6c3d6; display: grid; place-items: center; align-self: center; }
+  .opt[aria-checked="true"] { border-color: var(--blue); background: #f2f8ff; box-shadow: 0 0 0 4px rgba(11,83,148,.12); }
+  .opt[aria-checked="true"] .radio { border-color: var(--blue); background: var(--blue); }
+  .opt[aria-checked="true"] .radio::after { content: ""; width: 9px; height: 9px; border-radius: 50%; background: #fff; }
+  .opt:disabled { cursor: default; }
+  .options.locked .opt:not(.chosen) { opacity: .55; }
+  .opt .tag { display: none; position: absolute; top: -11px; right: 16px; font-size: 11.5px; font-weight: 800; letter-spacing: .04em; padding: 3px 10px; border-radius: 999px; }
+  .options.locked .opt.best .tag { display: inline-block; background: var(--green); color: #fff; }
+  .options.locked .opt.chosen:not(.best) .tag { display: inline-block; background: var(--orange); color: #fff; }
+  .options.locked .opt.best { opacity: 1; border-color: var(--green); }
+  .options.locked .opt.chosen:not(.best) { border-color: var(--orange); background: #fff8f2; box-shadow: none; }
+  .options.locked .opt.chosen:not(.best) .radio { border-color: var(--orange); background: var(--orange); }
+  .options.locked .opt.chosen.best { background: #effbf6; box-shadow: none; }
+  .options.locked .opt.chosen.best .radio { border-color: var(--green); background: var(--green); }
+
+  /* Outcome */
+  .outcome { border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow); background: #fff; animation: rise .35s ease; }
+  @keyframes rise { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+  .outcome-top { padding: 20px 24px; color: #fff; }
+  .outcome-top.good { background: linear-gradient(120deg, var(--green), #13b07c); }
+  .outcome-top.weak { background: linear-gradient(120deg, #d9580a, var(--orange)); }
+  .verdict { display: inline-block; font-size: 12px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; background: rgba(255,255,255,.22); padding: 4px 10px; border-radius: 999px; margin-bottom: 8px; }
+  .outcome-top h3 { font-size: 20px; font-weight: 800; }
+  .outcome-body { padding: 20px 24px 24px; display: grid; gap: 16px; }
+  .ob-block h4 { margin: 0 0 4px; font-size: 13px; letter-spacing: .05em; text-transform: uppercase; color: var(--muted); }
+  .ob-block p { font-size: 15px; color: var(--ink); }
+  .strongest { font-size: 14.5px; background: var(--green-tint); border-radius: var(--radius-sm); padding: 12px 14px; }
+  .strongest b { color: #076a49; }
+
+  .groups { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 10px; }
+  .group { border-radius: var(--radius-sm); padding: 12px; border: 1.5px solid var(--line); }
+  .group .gname { font-weight: 800; font-size: 14px; }
+  .group .gfx { display: inline-block; font-size: 11.5px; font-weight: 800; padding: 2px 8px; border-radius: 999px; margin: 4px 0; }
+  .group p { font-size: 13.5px; color: var(--ink-soft); }
+  .gfx.up { background: var(--green-tint); color: #076a49; }
+  .gfx.down { background: var(--orange-tint); color: #a54500; }
+  .gfx.flat { background: #eeedf5; color: var(--muted); }
+
+  .pressure { display: grid; grid-template-columns: 1fr auto 1fr; gap: 10px; align-items: stretch; }
+  .pressure .pbox { border-radius: var(--radius-sm); padding: 12px 14px; }
+  .pressure .pbox h5 { margin: 0 0 3px; font-size: 12px; letter-spacing: .05em; text-transform: uppercase; }
+  .pressure .pbox p { font-size: 14px; }
+  .pressure .parrow { display: grid; place-items: center; font-weight: 800; color: var(--muted); font-size: 20px; }
+  .pb-comp { background: var(--pink-tint); } .pb-comp h5 { color: var(--pink); }
+  .pb-resp { background: var(--blue-tint); } .pb-resp h5 { color: var(--blue); }
+
+  /* Side panel */
+  .side { display: flex; flex-direction: column; gap: 14px; position: sticky; top: 14px; }
+  .side .card { padding: 18px; }
+  .side h3 { font-size: 13px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); margin-bottom: 12px; }
+  .snap { display: grid; gap: 10px; }
+  .snap-row { display: flex; justify-content: space-between; gap: 10px; font-size: 14px; border-bottom: 1px dashed var(--line); padding-bottom: 8px; }
+  .snap-row:last-child { border-bottom: 0; padding-bottom: 0; }
+  .snap-row span:first-child { color: var(--muted); }
+  .snap-row span:last-child { font-weight: 700; text-align: right; }
+  .company { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+  .company .logo-mark { width: 38px; height: 38px; border-radius: 12px; display: grid; place-items: center; color: #fff; background: linear-gradient(135deg, var(--green), #2bc48f); }
+  .company .logo-mark svg { width: 22px; height: 22px; }
+  .company b { display: block; font-size: 17px; }
+  .company small { color: var(--muted); font-size: 12.5px; }
+
+  .meter { margin-bottom: 12px; }
+  .meter:last-child { margin-bottom: 0; }
+  .meter-top { display: flex; align-items: center; gap: 8px; font-size: 13.5px; font-weight: 700; margin-bottom: 5px; }
+  .meter-top .mic { width: 22px; height: 22px; border-radius: 7px; display: grid; place-items: center; color: #fff; }
+  .meter-top .mic svg { width: 14px; height: 14px; }
+  .meter-top .lvl { margin-left: auto; font-size: 12px; color: var(--muted); font-weight: 700; }
+  .meter-top .chg { font-size: 12px; font-weight: 800; }
+  .chg.up { color: var(--green); } .chg.down { color: var(--orange); }
+  .track { height: 10px; border-radius: 999px; background: #eceaf4; overflow: hidden; }
+  .fill { height: 100%; border-radius: 999px; transition: width .6s ease; }
+
+  /* Results */
+  .impact-grid { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 14px; }
+  .impact { border-radius: var(--radius); padding: 18px; background: #fff; box-shadow: var(--shadow); border-top: 5px solid; }
+  .impact .itop { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+  .impact .iic { width: 40px; height: 40px; border-radius: 12px; display: grid; place-items: center; color: #fff; }
+  .impact .iic svg { width: 22px; height: 22px; }
+  .impact h3 { font-size: 16px; }
+  .impact .ilvl { margin-left: auto; font-size: 13px; font-weight: 800; padding: 4px 10px; border-radius: 999px; }
+  .impact .track { height: 14px; }
+  .segs { display: flex; justify-content: space-between; font-size: 11px; color: var(--muted); margin-top: 5px; font-weight: 600; }
+
+  .recap { display: grid; gap: 10px; }
+  .recap-row { display: flex; align-items: center; gap: 12px; padding: 12px 14px; border-radius: var(--radius-sm); background: #f7f5fc; }
+  .recap-row .rn { font-size: 12px; font-weight: 800; color: var(--muted); min-width: 64px; text-transform: uppercase; letter-spacing: .04em; }
+  .recap-row .rc { font-weight: 700; font-size: 14.5px; }
+  .recap-row .rs { margin-left: auto; flex-shrink: 0; font-size: 12px; font-weight: 800; padding: 4px 10px; border-radius: 999px; }
+  .rs.ok { background: var(--green-tint); color: #076a49; }
+  .rs.no { background: var(--orange-tint); color: #a54500; }
+
+  .connections { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 12px; }
+  .conn { border-radius: var(--radius-sm); padding: 16px; color: var(--ink); }
+  .conn .cn { font-size: 26px; font-weight: 800; line-height: 1; margin-bottom: 8px; }
+  .conn p { font-size: 14.5px; font-weight: 600; }
+  .score-pill { display: inline-flex; align-items: center; gap: 8px; background: #fff; color: var(--ink); font-weight: 800; font-size: 14px; padding: 7px 14px; border-radius: 999px; margin-top: 14px; }
+
+  .footer { text-align: center; font-size: 12.5px; color: var(--ink-soft); margin-top: 22px; }
+  .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); border: 0; }
+
+  @media (max-width: 920px) {
+    .layout { grid-template-columns: minmax(0, 1fr); }
+    .side { position: static; order: 2; }
+  }
+  @media (max-width: 680px) {
+    .card { padding: 18px; }
+    .hero { padding: 26px 20px; }
+    .brief-grid, .facts, .how, .connections, .impact-grid { grid-template-columns: minmax(0,1fr); }
+    .chain .arrow { display: none; }
+    .chain { gap: 6px; }
+    .chain .node { min-width: calc(50% - 6px); }
+    .pressure { grid-template-columns: minmax(0,1fr); }
+    .pressure .parrow { transform: rotate(90deg); }
+    .opt { padding: 14px; gap: 12px; }
+    .opt .oic { width: 42px; height: 42px; }
+    .outcome-top, .outcome-body { padding-left: 18px; padding-right: 18px; }
+    .steps .name { font-size: 10.5px; }
+    .actions .btn { width: 100%; justify-content: center; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { transition: none !important; animation: none !important; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-name">Nexford University</span>
+      <span class="brand-course">BUS2125 The World of Business &middot; Business and Society</span>
+    </div>
+    <span class="chip-practice"><span class="dot" aria-hidden="true"></span>Practice Activity</span>
+  </header>
+
+  <nav class="progress" aria-label="Activity progress">
+    <div class="progress-label" id="progressLabel" aria-live="polite">Getting started<small>Brief</small></div>
+    <ol class="steps" id="steps">
+      <li><div class="bar"><span></span></div><span class="name">Brief</span></li>
+      <li><div class="bar"><span></span></div><span class="name">Round 1</span></li>
+      <li><div class="bar"><span></span></div><span class="name">Round 2</span></li>
+      <li><div class="bar"><span></span></div><span class="name">Round 3</span></li>
+      <li><div class="bar"><span></span></div><span class="name">Impact</span></li>
+    </ol>
+  </nav>
+
+  <main class="layout" id="layout">
+    <section class="stage" id="stage" aria-live="off"></section>
+    <aside class="side" id="side" aria-label="Business snapshot"></aside>
+  </main>
+
+  <p class="footer">Practice Activity &middot; Ungraded &middot; Nexford University</p>
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  /* ---------- Icons (inline SVG line icons) ---------- */
+  var ICONS = {
+    sprout: '<path d="M12 21v-9"/><path d="M12 12c0-4 3-7 8-7 0 5-3 8-8 7z"/><path d="M12 14c0-3-2.5-5.5-7-5.5 0 4 2.5 6.5 7 5.5z"/>',
+    people: '<circle cx="9" cy="8" r="3"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6"/><circle cx="17" cy="9" r="2.5"/><path d="M16.5 14.2c2.6.4 4.5 2.8 4.5 5.8"/>',
+    target: '<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.4"/>',
+    trend: '<path d="M3 17l5-5 4 4 8-8"/><path d="M15 8h5v5"/>',
+    grid: '<rect x="4" y="4" width="6.5" height="6.5" rx="1.6"/><rect x="13.5" y="4" width="6.5" height="6.5" rx="1.6"/><rect x="4" y="13.5" width="6.5" height="6.5" rx="1.6"/><rect x="13.5" y="13.5" width="6.5" height="6.5" rx="1.6"/>',
+    clock: '<circle cx="11" cy="11" r="8"/><path d="M11 7v4l3 2"/><path d="M15.5 19.5l2 2 4-4.5"/>',
+    tag: '<path d="M3.5 3.5h7.6l9.4 9.4-7.6 7.6-9.4-9.4z"/><circle cx="8" cy="8" r="1.6"/>',
+    moon: '<path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/>',
+    box: '<path d="M3 7.5L12 3l9 4.5v9L12 21l-9-4.5z"/><path d="M3 7.5l9 4.5 9-4.5"/><path d="M12 12v9"/>',
+    network: '<circle cx="12" cy="5" r="2.5"/><circle cx="5" cy="18" r="2.5"/><circle cx="19" cy="18" r="2.5"/><path d="M10.8 7.2L6.2 15.8"/><path d="M13.2 7.2l4.6 8.6"/><path d="M7.5 18h9"/>',
+    phone: '<rect x="6" y="2.5" width="12" height="19" rx="2.5"/><path d="M10 18.5h4"/><path d="M9 7.5h6"/><path d="M9 11h4"/>',
+    priceDown: '<path d="M4 6h10"/><path d="M4 12h7"/><path d="M4 18h4"/><path d="M18 5v14"/><path d="M14.5 15.5L18 19l3.5-3.5"/>',
+    anchor: '<circle cx="12" cy="5" r="2"/><path d="M12 7v14"/><path d="M8.5 11h7"/><path d="M4 14a8 8 0 0 0 16 0"/>',
+    spark: '<path d="M12 3l2.2 5.8L20 11l-5.8 2.2L12 19l-2.2-5.8L4 11l5.8-2.2z"/>',
+    coins: '<ellipse cx="12" cy="6" rx="7" ry="2.5"/><path d="M5 6v6c0 1.4 3.1 2.5 7 2.5s7-1.1 7-2.5V6"/><path d="M5 12v6c0 1.4 3.1 2.5 7 2.5s7-1.1 7-2.5v-6"/>',
+    link: '<path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/>',
+    bulb: '<path d="M9 18h6"/><path d="M10 21h4"/><path d="M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2.1h5c0-.9.4-1.6 1-2.1A6 6 0 0 0 12 3z"/>',
+    hourglass: '<path d="M7 3h10"/><path d="M7 21h10"/><path d="M8 3v3l4 6-4 6v3"/><path d="M16 3v3l-4 6 4 6v3"/>',
+    bubble: '<path d="M4 5h16v11H9l-5 4z"/><path d="M8 9.5h8"/><path d="M8 12.5h5"/>',
+    bars: '<path d="M5 20V11"/><path d="M12 20V4"/><path d="M19 20v-6"/>',
+    flame: '<path d="M12 21c-4 0-7-2.7-7-6.5C5 10 9 8 9 3c3 2 4.5 4.5 4.5 7 1-1 1.5-2 1.5-3 2.5 2 4 4.5 4 7.5 0 3.8-3 6.5-7 6.5z"/>',
+    truck: '<path d="M2.5 6h11v9h-11z"/><path d="M13.5 9.5h4l3 3V15h-7z"/><circle cx="6.5" cy="17.5" r="1.8"/><circle cx="16.5" cy="17.5" r="1.8"/>',
+    arrowR: '<path d="M5 12h14"/><path d="M13 6l6 6-6 6"/>',
+    replay: '<path d="M4 12a8 8 0 1 0 2.4-5.7"/><path d="M4 4v4.5h4.5"/>',
+    check: '<path d="M5 12.5l4.5 4.5L19 7.5"/>'
+  };
+  function icon(name) {
+    return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">' + ICONS[name] + '</svg>';
+  }
+
+  /* ---------- Impact areas ---------- */
+  var AREAS = [
+    { key: "cv", name: "Customer Value", icon: "spark", color: "#e0306f", tint: "#ffe3ee" },
+    { key: "rev", name: "Revenue", icon: "coins", color: "#ee6a0c", tint: "#ffe9d6" },
+    { key: "emp", name: "Employment & Suppliers", icon: "link", color: "#0b9466", tint: "#d9f6ea" },
+    { key: "inn", name: "Innovation", icon: "bulb", color: "#0b5394", tint: "#dcebfa" }
+  ];
+  var START = 35;
+  var CHAIN = ["Customer Need", "Business Offering", "Customer Value", "Customer Purchase", "Revenue"];
+
+  /* ---------- Rounds ---------- */
+  var ROUNDS = [
+    {
+      chip: "Customer Value", color: "#e0306f", tint: "#ffe3ee",
+      title: "What do Sprig's customers need most?",
+      setup: function () {
+        return "Sprig has been running for six months. To decide what to improve first, the founders looked closely at customer behavior and feedback. Here is what they found.";
+      },
+      factsTitle: "What customers are telling Sprig",
+      facts: [
+        { icon: "hourglass", title: "Short breaks", text: "Most customers get 30 to 45 minutes for lunch, and nearly all orders arrive between 11:00 and 11:30 a.m." },
+        { icon: "bubble", title: "Top complaint", text: "7 out of 10 complaints say lunch arrived after the customer's break had already started." },
+        { icon: "bars", title: "Food and price", text: "Food is rated 4.6 out of 5. A few customers would try new dishes, and a few say the price feels a little high." }
+      ],
+      question: "Which decision best responds to the customer need and strengthens Sprig's value proposition?",
+      options: [
+        {
+          icon: "grid", grad: "linear-gradient(135deg,#e0306f,#ff6a9a)",
+          title: "Expand the menu",
+          text: "Add eight new dishes so regular customers have more variety through the week.",
+          best: false, delta: { cv: 6, rev: 4, emp: 0, inn: 6 }, chain: 2, orders: 70,
+          headline: "New dishes get a warm welcome, but the complaints keep coming.",
+          why: "Variety was a minor request. The main customer need was getting lunch on time within a short break, and late deliveries still cut into it.",
+          link: "Value comes from answering the customer need. When the core need stays unmet, some customers stop reordering, so purchases and revenue grow slowly."
+        },
+        {
+          icon: "clock", grad: "linear-gradient(135deg,#0b5394,#2f8ad8)",
+          title: "Guarantee delivery windows",
+          text: "Let customers pick a 15-minute delivery window by 10 a.m., then plan routes so every lunch arrives inside it.",
+          best: true, delta: { cv: 30, rev: 22, emp: 6, inn: 14 }, chain: 5, orders: 100,
+          headline: "Late-delivery complaints drop sharply, and reorders climb.",
+          why: "Customers' biggest problem was time. Reliable, convenient delivery directly answers that need, which strengthens Sprig's value proposition.",
+          link: "The full chain connects: a clear need, an offering that meets it, real value, repeat purchases, and more revenue to keep the business running."
+        },
+        {
+          icon: "tag", grad: "linear-gradient(135deg,#ee6a0c,#ffa040)",
+          title: "Lower the price",
+          text: "Cut the price of every lunch by $2 so Sprig is more affordable than nearby cafes.",
+          best: false, delta: { cv: 8, rev: -8, emp: 0, inn: 0 }, chain: 1, orders: 80,
+          headline: "Orders tick up for a few weeks, but each lunch now earns less.",
+          why: "Price was a small concern. A cheaper lunch that still arrives late does not solve the problem customers care about most.",
+          link: "Lower prices reduce the revenue from every order, leaving less money to pay employees and suppliers and to keep delivering value."
+        }
+      ]
+    },
+    {
+      chip: "Business Network", color: "#0b9466", tint: "#d9f6ea",
+      title: "Orders are growing. How should Sprig keep up?",
+      setup: function (s) {
+        var c = s.choices[0];
+        var bridge = (c !== null && ROUNDS[0].options[c].best)
+          ? "Word spread about Sprig's on-time lunches, and new office teams signed up."
+          : "A new office building opened two blocks away, and orders rose even though the earlier issue was not fully solved.";
+        return '<p class="bridge">' + bridge + '</p><p>Sprig now gets about 180 lunch orders a day. The two founders are cooking from 5 a.m. and driving deliveries until 1 p.m., and they buy ingredients from a grocery warehouse store each evening. Something has to change.</p>';
+      },
+      factsTitle: "Where Sprig stands",
+      facts: [
+        { icon: "trend", title: "Demand", text: "About 180 orders a day, and new office teams are asking to join." },
+        { icon: "people", title: "People", text: "Only the two founders, already working 12-hour days." },
+        { icon: "truck", title: "Supplies", text: "Ingredients bought at retail each evening, with no regular partners." }
+      ],
+      question: "Which growth decision best supports Sprig and creates economic activity beyond the company?",
+      options: [
+        {
+          icon: "moon", grad: "linear-gradient(135deg,#3b3fb8,#6b6fe0)",
+          title: "Keep it in the founders' hands",
+          text: "The two founders extend their hours and add evening prep so Sprig takes on no new costs.",
+          best: false, delta: { cv: -6, rev: 6, emp: 0, inn: 0 }, team: "2 founders", partners: "Grocery warehouse store",
+          headline: "Sprig saves money, but the founders hit their limit.",
+          why: "Without more people or partners, the business cannot keep up. Deliveries begin to slip, and the growth stays inside the company.",
+          link: "Revenue rises a little, but very little of it flows to other workers or businesses. Growth handled this way creates almost no economic activity beyond Sprig.",
+          groups: [
+            { name: "Founders", fx: "down", label: "Strained", text: "Longer days with no added help." },
+            { name: "Customers", fx: "down", label: "Less value", text: "Late lunches start to return." },
+            { name: "Local workers", fx: "flat", label: "No change", text: "No new jobs or income created." },
+            { name: "Other businesses", fx: "flat", label: "No change", text: "No new orders from Sprig." }
+          ]
+        },
+        {
+          icon: "box", grad: "linear-gradient(135deg,#ee6a0c,#ffa040)",
+          title: "Source ready-made meals",
+          text: "Buy pre-made lunches from one large regional food wholesaler and focus Sprig on delivery.",
+          best: false, delta: { cv: -10, rev: 10, emp: 10, inn: 0 }, team: "2 founders + 1 driver", partners: "1 regional wholesaler",
+          headline: "Sprig handles the volume, but customers notice the food has changed.",
+          why: "Buying from the wholesaler creates revenue for that business, but Sprig now depends on a single partner and loses the freshness customers valued.",
+          link: "Business networks connect companies. Who a business buys from shapes both the value it delivers and where its spending goes.",
+          groups: [
+            { name: "Wholesaler", fx: "up", label: "Gains", text: "Earns revenue from Sprig's large orders." },
+            { name: "New driver", fx: "up", label: "Gains", text: "One new job and income." },
+            { name: "Customers", fx: "down", label: "Less value", text: "Meals feel less fresh." },
+            { name: "Sprig", fx: "down", label: "More risk", text: "Relies on one partner to operate." }
+          ]
+        },
+        {
+          icon: "network", grad: "linear-gradient(135deg,#0b9466,#2bc48f)",
+          title: "Build a local team and partners",
+          text: "Hire three local cooks and drivers, buy produce from a nearby Ohio farm, and contract a local packaging company.",
+          best: true, delta: { cv: 12, rev: 18, emp: 34, inn: 4 }, team: "2 founders + 3 local hires", partners: "Local farm, packaging company",
+          headline: "Sprig keeps pace with demand, and its growth spreads outward.",
+          why: "New employees earn income they can use for household needs, purchases, and savings. The farm and packaging company earn revenue from Sprig's orders.",
+          link: "Growth created economic activity beyond Sprig itself. At the same time, Sprig now depends on its partners to keep its own business running.",
+          groups: [
+            { name: "New employees", fx: "up", label: "Gains", text: "Three people earn steady income." },
+            { name: "Local farm", fx: "up", label: "Gains", text: "Earns revenue from weekly produce orders." },
+            { name: "Packaging company", fx: "up", label: "Gains", text: "Earns revenue from a new regular client." },
+            { name: "Customers", fx: "up", label: "More value", text: "Fresh lunches still arrive on time." }
+          ]
+        }
+      ]
+    },
+    {
+      chip: "Innovation & Competition", color: "#ee6a0c", tint: "#ffe9d6",
+      title: "A new competitor arrives. How should Sprig respond?",
+      setup: function (s) {
+        var c = s.choices[1];
+        var bridge = (c !== null && ROUNDS[1].options[c].best)
+          ? "With its local team and partners in place, Sprig is delivering fresh lunches reliably at its new size."
+          : "Sprig is still working through the strain of growing quickly.";
+        return '<p class="bridge">' + bridge + '</p><p>Then a national delivery app adds lunch from several chain restaurants across Sprig\'s area. Customers can order in a few taps, follow their driver live, and often pay a little less.</p>';
+      },
+      factsTitle: "What changed",
+      facts: [
+        { icon: "flame", title: "New alternative", text: "The app offers quick ordering from many restaurants in one place." },
+        { icon: "phone", title: "New expectation", text: "Several regulars say they like seeing exactly when lunch will arrive." },
+        { icon: "tag", title: "Price gap", text: "Some app deals are about $1 cheaper than a Sprig lunch." }
+      ],
+      question: "Which response best improves customer value in the face of this competition?",
+      options: [
+        {
+          icon: "phone", grad: "linear-gradient(135deg,#0b5394,#2f8ad8)",
+          title: "Make ordering and tracking easier",
+          text: "Launch simple text-message ordering with live arrival updates, and let customers set up a repeating weekly lunch order.",
+          best: true, delta: { cv: 20, rev: 14, emp: 6, inn: 30 },
+          compTxt: "The app made ordering faster and delivery easier to follow.",
+          respTxt: "Sprig improved its own process to make ordering more convenient and reliable.",
+          headline: "Customers stay, and new ones join for the convenience.",
+          why: "Sprig did not invent new technology. It improved a process to make ordering easier and delivery more predictable, which is innovation driven by competition.",
+          link: "Customer value rises, and repeating weekly orders give Sprig steadier revenue to pay its employees and suppliers."
+        },
+        {
+          icon: "priceDown", grad: "linear-gradient(135deg,#e0306f,#ff6a9a)",
+          title: "Match the app's prices",
+          text: "Lower Sprig's prices to equal the app's cheapest lunch deals so customers have no price reason to switch.",
+          best: false, delta: { cv: 6, rev: -10, emp: -4, inn: 0 },
+          compTxt: "The app offered convenience and slightly lower prices.",
+          respTxt: "Sprig responded on price only, leaving the convenience gap open.",
+          headline: "Sprig keeps some customers but earns less from every order.",
+          why: "Price is only one part of value. The app's real advantage was convenience, and this response does not address it.",
+          link: "Lower revenue per lunch leaves less to pay employees and suppliers, which can weaken the network Sprig depends on."
+        },
+        {
+          icon: "anchor", grad: "linear-gradient(135deg,#3b3fb8,#6b6fe0)",
+          title: "Stay the course",
+          text: "Keep the current service unchanged. Sprig's food is fresher, and loyal customers should stay.",
+          best: false, delta: { cv: -8, rev: -8, emp: 0, inn: -4 },
+          compTxt: "The app gave customers a more convenient alternative.",
+          respTxt: "Sprig made no improvement, so customers compared and some switched.",
+          headline: "Some regulars quietly switch to the app.",
+          why: "Competition gives businesses a reason to improve because customers may choose alternatives. Standing still let the competitor offer more convenience.",
+          link: "As orders fall, revenue drops, which affects Sprig and the employees and suppliers connected to it."
+        }
+      ]
+    }
+  ];
+
+  /* ---------- State ---------- */
+  var state;
+  function reset() {
+    state = { step: 0, choices: [null, null, null], selected: null, locked: false, meters: {}, last: {} };
+    AREAS.forEach(function (a) { state.meters[a.key] = START; state.last[a.key] = 0; });
+  }
+
+  var stage = document.getElementById("stage");
+  var side = document.getElementById("side");
+  var layout = document.getElementById("layout");
+
+  function clamp(v) { return Math.max(5, Math.min(100, v)); }
+  function level(v) {
+    if (v >= 80) return "Thriving";
+    if (v >= 60) return "Strong";
+    if (v >= 40) return "Developing";
+    return "Limited";
+  }
+
+  /* ---------- Progress ---------- */
+  function renderProgress() {
+    var labels = [
+      ["Getting started", "Brief"],
+      ["Round 1 of 3", "Customer Value"],
+      ["Round 2 of 3", "Business Network"],
+      ["Round 3 of 3", "Innovation & Competition"],
+      ["Complete", "Your Business Impact"]
+    ];
+    var l = labels[state.step];
+    document.getElementById("progressLabel").innerHTML = l[0] + "<small>" + l[1] + "</small>";
+    var items = document.getElementById("steps").children;
+    for (var i = 0; i < items.length; i++) {
+      items[i].className = i < state.step ? "done" : (i === state.step ? "current" : "");
+      if (i === state.step) items[i].setAttribute("aria-current", "step"); else items[i].removeAttribute("aria-current");
+    }
+  }
+
+  /* ---------- Side panel ---------- */
+  function snapshot() {
+    var orders = "About 60 a day", team = "2 founders", partners = "Grocery warehouse store";
+    if (state.choices[0] !== null) orders = "About " + ROUNDS[0].options[state.choices[0]].orders + " a day";
+    if (state.step >= 2) orders = "About 180 a day";
+    if (state.choices[1] !== null) {
+      var o2 = ROUNDS[1].options[state.choices[1]];
+      team = o2.team; partners = o2.partners;
+    }
+    return { orders: orders, team: team, partners: partners };
+  }
+  function meterHTML(a) {
+    var v = state.meters[a.key], d = state.last[a.key], chg = "";
+    if (d > 0) chg = '<span class="chg up" aria-label="increased">&#9650;</span>';
+    if (d < 0) chg = '<span class="chg down" aria-label="decreased">&#9660;</span>';
+    return '<div class="meter"><div class="meter-top"><span class="mic" style="background:' + a.color + '">' + icon(a.icon) + '</span>' + a.name + chg + '<span class="lvl">' + level(v) + '</span></div>' +
+      '<div class="track" role="meter" aria-label="' + a.name + '" aria-valuemin="0" aria-valuemax="100" aria-valuenow="' + v + '" aria-valuetext="' + level(v) + '"><div class="fill" style="width:' + v + '%;background:' + a.color + '"></div></div></div>';
+  }
+  function renderSide() {
+    var s = snapshot();
+    side.innerHTML =
+      '<div class="card"><div class="company"><span class="logo-mark">' + icon("sprout") + '</span><div><b>Sprig</b><small>Columbus, Ohio</small></div></div>' +
+      '<div class="snap">' +
+      '<div class="snap-row"><span>Lunch orders</span><span>' + s.orders + '</span></div>' +
+      '<div class="snap-row"><span>Team</span><span>' + s.team + '</span></div>' +
+      '<div class="snap-row"><span>Partners</span><span>' + s.partners + '</span></div>' +
+      '</div></div>' +
+      '<div class="card"><h3>Business pulse</h3>' + AREAS.map(meterHTML).join("") + '</div>';
+  }
+
+  /* ---------- Screens ---------- */
+  function renderIntro() {
+    stage.innerHTML =
+      '<div class="hero">' +
+        '<div class="eyebrow">Business and Society</div>' +
+        '<h1>Business <span class="mark">Value</span> in Action</h1>' +
+        '<p class="lead">Help a young lunch business make three connected decisions, and see how each one reaches customers, workers, and other businesses.</p>' +
+      '</div>' +
+      '<div class="card">' +
+        '<h2 tabindex="-1" id="screenTitle" style="font-size:22px;font-weight:800;margin-bottom:6px">Meet Sprig</h2>' +
+        '<p style="color:var(--ink-soft);margin-bottom:16px">You are joining Sprig as an advisor to its two founders. Here is the quick version.</p>' +
+        '<div class="brief-grid">' +
+          '<div class="tile t-green"><span class="ic">' + icon("sprout") + '</span><div><h3>What it sells</h3><p>Fresh, ready-to-eat weekday lunches, prepared each morning and delivered to workplaces.</p></div></div>' +
+          '<div class="tile t-blue"><span class="ic">' + icon("people") + '</span><div><h3>Who buys</h3><p>Office workers in downtown Columbus, Ohio, who have short lunch breaks.</p></div></div>' +
+          '<div class="tile t-pink"><span class="ic">' + icon("target") + '</span><div><h3>The need</h3><p>A healthy lunch they can actually eat within their break, without leaving the office.</p></div></div>' +
+          '<div class="tile t-orange"><span class="ic">' + icon("trend") + '</span><div><h3>Where it stands</h3><p>Six months old, about 60 orders a day, run entirely by the two founders.</p></div></div>' +
+        '</div>' +
+      '</div>' +
+      '<div class="card">' +
+        '<div class="section-title">The relationship you will be testing</div>' +
+        chainHTML(5, true) +
+        '<p class="note" style="margin-top:14px">Each decision you make will also show how Sprig\'s choices reach beyond the sale, to employees, suppliers, and other businesses.</p>' +
+      '</div>' +
+      '<div class="card">' +
+        '<div class="section-title">How it works</div>' +
+        '<div class="how">' +
+          '<div class="step"><div class="num">Round 1</div><h3>Customer Value</h3><p>Read what customers need and choose the best response.</p></div>' +
+          '<div class="step"><div class="num">Round 2</div><h3>Business Network</h3><p>Decide how Sprig grows as orders increase.</p></div>' +
+          '<div class="step"><div class="num">Round 3</div><h3>Innovation & Competition</h3><p>Respond to a new competing alternative.</p></div>' +
+        '</div>' +
+        '<p class="note" style="margin-top:14px">You get one attempt per round. Once you confirm a decision, it is recorded and the story moves on, whether or not it was the strongest choice. This activity is ungraded.</p>' +
+        '<div class="actions" style="margin-top:18px"><span class="hint">About 8 minutes</span><button class="btn btn-primary" id="startBtn" type="button">Start Round 1 ' + icon("arrowR") + '</button></div>' +
+      '</div>';
+    document.getElementById("startBtn").addEventListener("click", function () { go(1); });
+  }
+
+  function chainHTML(lit, neutral) {
+    var out = '<div class="chain" aria-label="Customer need to revenue chain">';
+    CHAIN.forEach(function (n, i) {
+      var cls = neutral ? "lit" : (i < lit ? "lit" : "miss");
+      out += '<div class="node ' + cls + '">' + n + '</div>';
+      if (i < CHAIN.length - 1) out += '<div class="arrow" aria-hidden="true">&#8250;</div>';
+    });
+    return out + '</div>';
+  }
+
+  function renderRound() {
+    var r = ROUNDS[state.step - 1];
+    var setup = r.setup(state);
+    if (setup.charAt(0) !== "<") setup = "<p>" + setup + "</p>";
+    var html =
+      '<div class="card round-head">' +
+        '<span class="round-chip" style="background:' + r.color + '">Round ' + state.step + ' of 3 &middot; ' + r.chip + '</span>' +
+        '<h2 tabindex="-1" id="screenTitle">' + r.title + '</h2>' +
+        setup +
+      '</div>' +
+      '<div class="card">' +
+        '<div class="section-title">' + r.factsTitle + '</div>' +
+        '<div class="facts">' + r.facts.map(function (f) {
+          return '<div class="fact" style="background:' + r.tint + '"><span class="fic" style="color:' + r.color + '">' + icon(f.icon) + '</span><h3>' + f.title + '</h3><p>' + f.text + '</p></div>';
+        }).join("") + '</div>' +
+      '</div>' +
+      '<div class="card">' +
+        '<p class="question" id="qText">' + r.question + '</p>' +
+        '<p class="question-sub">All three are reasonable business moves. Pick the one that fits the situation best.</p>' +
+        '<div class="options" id="options" role="radiogroup" aria-labelledby="qText">' +
+          r.options.map(function (o, i) {
+            return '<button type="button" class="opt" role="radio" aria-checked="false" data-i="' + i + '">' +
+              '<span class="tag">' + (o.best ? "Strongest fit" : "Your choice") + '</span>' +
+              '<span class="oic" style="background:' + o.grad + '">' + icon(o.icon) + '</span>' +
+              '<span><span class="letter">OPTION ' + "ABC".charAt(i) + '</span><h3>' + o.title + '</h3><p>' + o.text + '</p></span>' +
+              '<span class="radio" aria-hidden="true"></span>' +
+            '</button>';
+          }).join("") +
+        '</div>' +
+        '<div class="actions" style="margin-top:18px"><span class="hint" id="hint">Select an option, then confirm. One attempt only.</span>' +
+        '<button class="btn btn-primary" id="confirmBtn" type="button" disabled>Confirm decision ' + icon("check") + '</button></div>' +
+      '</div>' +
+      '<div id="outcomeSlot"></div>';
+    stage.innerHTML = html;
+
+    var opts = stage.querySelectorAll(".opt");
+    Array.prototype.forEach.call(opts, function (btn, idx) {
+      btn.setAttribute("tabindex", idx === 0 ? "0" : "-1");
+      btn.addEventListener("click", function () { select(idx); });
+      btn.addEventListener("keydown", function (e) {
+        var k = e.key, n = null;
+        if (k === "ArrowDown" || k === "ArrowRight") n = (idx + 1) % opts.length;
+        if (k === "ArrowUp" || k === "ArrowLeft") n = (idx - 1 + opts.length) % opts.length;
+        if (n !== null && !state.locked) { e.preventDefault(); select(n); opts[n].focus(); }
+      });
+    });
+    document.getElementById("confirmBtn").addEventListener("click", confirmChoice);
+  }
+
+  function select(i) {
+    if (state.locked) return;
+    state.selected = i;
+    var opts = stage.querySelectorAll(".opt");
+    Array.prototype.forEach.call(opts, function (b, j) {
+      b.setAttribute("aria-checked", j === i ? "true" : "false");
+      b.setAttribute("tabindex", j === i ? "0" : "-1");
+    });
+    document.getElementById("confirmBtn").disabled = false;
+  }
+
+  function confirmChoice() {
+    if (state.locked || state.selected === null) return;
+    var ri = state.step - 1, r = ROUNDS[ri], o = r.options[state.selected];
+    state.locked = true;
+    state.choices[ri] = state.selected;
+    AREAS.forEach(function (a) {
+      var d = o.delta[a.key] || 0;
+      state.meters[a.key] = clamp(state.meters[a.key] + d);
+      state.last[a.key] = d;
+    });
+
+    var wrap = document.getElementById("options");
+    wrap.classList.add("locked");
+    var opts = wrap.querySelectorAll(".opt");
+    Array.prototype.forEach.call(opts, function (b, j) {
+      b.disabled = true;
+      if (j === state.selected) b.classList.add("chosen");
+      if (r.options[j].best) b.classList.add("best");
+    });
+    var cb = document.getElementById("confirmBtn");
+    cb.parentNode.removeChild(cb);
+    document.getElementById("hint").textContent = o.best ? "Decision recorded as the strongest fit." : "Decision recorded as not the strongest fit.";
+
+    var bestIdx = 0;
+    r.options.forEach(function (x, j) { if (x.best) bestIdx = j; });
+
+    var extra = "";
+    if (ri === 0) {
+      extra = '<div class="ob-block"><h4>Where the chain held</h4>' + chainHTML(o.chain, false) + '</div>';
+    } else if (ri === 1) {
+      extra = '<div class="ob-block"><h4>Who is affected</h4><div class="groups">' + o.groups.map(function (g) {
+        return '<div class="group"><div class="gname">' + g.name + '</div><span class="gfx ' + g.fx + '">' + g.label + '</span><p>' + g.text + '</p></div>';
+      }).join("") + '</div></div>';
+    } else {
+      extra = '<div class="ob-block"><h4>Competition and response</h4><div class="pressure">' +
+        '<div class="pbox pb-comp"><h5>Competitive pressure</h5><p>' + o.compTxt + '</p></div>' +
+        '<div class="parrow" aria-hidden="true">&#8594;</div>' +
+        '<div class="pbox pb-resp"><h5>Sprig\'s response</h5><p>' + o.respTxt + '</p></div></div></div>';
+    }
+
+    var nextLabel = state.step < 3 ? "Continue to Round " + (state.step + 1) : "See your business impact";
+    var html =
+      '<div class="outcome" role="region" aria-labelledby="outcomeTitle">' +
+        '<div class="outcome-top ' + (o.best ? "good" : "weak") + '">' +
+          '<span class="verdict">' + (o.best ? "Strongest fit" : "Not the strongest choice") + '</span>' +
+          '<h3 id="outcomeTitle" tabindex="-1">' + o.headline + '</h3>' +
+        '</div>' +
+        '<div class="outcome-body">' +
+          '<div class="ob-block"><h4>Why</h4><p>' + o.why + '</p></div>' +
+          '<div class="ob-block"><h4>The connection</h4><p>' + o.link + '</p></div>' +
+          extra +
+          (o.best ? "" : '<div class="strongest">The strongest choice was <b>Option ' + "ABC".charAt(bestIdx) + ': ' + r.options[bestIdx].title + '</b>. ' + r.options[bestIdx].why + '</div>') +
+          '<div class="actions"><span class="hint">Your decision has been recorded.</span><button class="btn btn-primary" id="nextBtn" type="button">' + nextLabel + ' ' + icon("arrowR") + '</button></div>' +
+        '</div>' +
+      '</div>';
+    var slot = document.getElementById("outcomeSlot");
+    slot.innerHTML = html;
+    renderSide();
+    document.getElementById("nextBtn").addEventListener("click", function () { go(state.step + 1); });
+    var t = document.getElementById("outcomeTitle");
+    try { slot.scrollIntoView({ behavior: "smooth", block: "start" }); } catch (e) { slot.scrollIntoView(); }
+    try { t.focus({ preventScroll: true }); } catch (e2) { t.focus(); }
+  }
+
+  function summaryText() {
+    var c = state.choices;
+    var s1 = [
+      "Your first decision added variety, but the core need for an on-time lunch stayed unmet, so customer value and revenue grew slowly.",
+      "You anchored Sprig in its customers' real need, an on-time lunch within a short break, which strengthened its value proposition and grew revenue.",
+      "Your first decision lowered prices, but the core need for an on-time lunch stayed unmet and each order earned less revenue."
+    ][c[0]];
+    var s2 = [
+      "When orders grew, you kept the work inside the business, so very little of Sprig's growth reached other workers or businesses.",
+      "When orders grew, your spending supported a large wholesaler, but Sprig became dependent on one partner and customers lost some of the freshness they valued.",
+      "When orders grew, you spread that growth to new employees, a local farm, and a packaging company, creating economic activity well beyond Sprig."
+    ][c[1]];
+    var s3 = [
+      "Facing new competition, you improved how customers order and track lunch, showing how competition can push a business to innovate.",
+      "Facing new competition, you competed on price alone, which protected some orders but reduced revenue.",
+      "Facing new competition, you held steady, and some customers chose the more convenient alternative."
+    ][c[2]];
+    return s1 + " " + s2 + " " + s3;
+  }
+
+  function renderResults() {
+    var bestCount = 0;
+    state.choices.forEach(function (c, i) { if (ROUNDS[i].options[c].best) bestCount++; });
+
+    var impact = AREAS.map(function (a) {
+      var v = state.meters[a.key];
+      var dir = v > START ? "Up from the start" : (v < START ? "Down from the start" : "Same as the start");
+      return '<div class="impact" style="border-top-color:' + a.color + '">' +
+        '<div class="itop"><span class="iic" style="background:' + a.color + '">' + icon(a.icon) + '</span><h3>' + a.name + '</h3>' +
+        '<span class="ilvl" style="background:' + a.tint + ';color:' + a.color + '">' + level(v) + '</span></div>' +
+        '<div class="track" role="meter" aria-label="' + a.name + '" aria-valuemin="0" aria-valuemax="100" aria-valuenow="' + v + '" aria-valuetext="' + level(v) + '"><div class="fill" style="width:' + v + '%;background:' + a.color + '"></div></div>' +
+        '<div class="segs"><span>Limited</span><span>Developing</span><span>Strong</span><span>Thriving</span></div>' +
+        '<p style="font-size:13px;color:var(--muted);margin-top:8px;font-weight:600">' + dir + '</p>' +
+      '</div>';
+    }).join("");
+
+    var recap = state.choices.map(function (c, i) {
+      var o = ROUNDS[i].options[c];
+      return '<div class="recap-row"><span class="rn">Round ' + (i + 1) + '</span><span class="rc">' + o.title + '</span>' +
+        '<span class="rs ' + (o.best ? "ok" : "no") + '">' + (o.best ? "Strongest fit" : "Recorded as incorrect") + '</span></div>';
+    }).join("");
+
+    stage.innerHTML =
+      '<div class="hero">' +
+        '<div class="eyebrow">Sprig, six months later</div>' +
+        '<h1 tabindex="-1" id="screenTitle">Your Business <span class="mark">Impact</span></h1>' +
+        '<p class="lead">' + summaryText() + '</p>' +
+        '<span class="score-pill">' + icon("check").replace('aria-hidden="true"', 'aria-hidden="true" width="18" height="18"') + bestCount + ' of 3 strongest decisions</span>' +
+      '</div>' +
+      '<div class="impact-grid">' + impact + '</div>' +
+      '<div class="card"><div class="section-title">Your decisions</div><div class="recap">' + recap + '</div></div>' +
+      '<div class="card"><div class="section-title">Key Connections</div><div class="connections">' +
+        '<div class="conn" style="background:#ffe3ee"><div class="cn" style="color:#e0306f">01</div><p>Customer needs influence the value a business must provide.</p></div>' +
+        '<div class="conn" style="background:#ffe9d6"><div class="cn" style="color:#c25200">02</div><p>Revenue allows business activity to continue and supports payments to employees and suppliers.</p></div>' +
+        '<div class="conn" style="background:#d9f6ea"><div class="cn" style="color:#077a54">03</div><p>Business decisions can create economic effects beyond the customer transaction.</p></div>' +
+      '</div>' +
+      '<div class="actions" style="margin-top:20px"><span class="hint">Replay to explore how different decisions change the outcome.</span>' +
+      '<button class="btn btn-ghost" id="againBtn" type="button">' + icon("replay") + ' Try Again</button></div></div>';
+
+    document.getElementById("againBtn").addEventListener("click", function () { reset(); go(0); });
+  }
+
+  /* ---------- Navigation ---------- */
+  function go(step) {
+    state.step = step;
+    state.selected = null;
+    state.locked = false;
+    AREAS.forEach(function (a) { state.last[a.key] = 0; });
+    layout.classList.toggle("full", step === 4);
+    renderProgress();
+    if (step === 0) renderIntro();
+    else if (step === 4) renderResults();
+    else renderRound();
+    if (step !== 4) renderSide();
+    try { window.scrollTo({ top: 0, behavior: "smooth" }); } catch (e) { window.scrollTo(0, 0); }
+    var t = document.getElementById("screenTitle");
+    if (t && step !== 0) { try { t.focus({ preventScroll: true }); } catch (e2) { t.focus(); } }
+  }
+
+  reset();
+  go(0);
+})();
+</script>
+</body>
+</html>
